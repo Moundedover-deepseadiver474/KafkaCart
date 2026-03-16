@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
 import { toast } from "react-hot-toast"
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function Login() {
+  usePageTitle("Login");
   const navigate = useNavigate();
   const { login } = useAppContext();
   const [formData, setFormData] = useState({

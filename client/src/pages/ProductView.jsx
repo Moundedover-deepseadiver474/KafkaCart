@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function ProductView() {
   const { id } = useParams();
@@ -8,6 +9,7 @@ export default function ProductView() {
   const { products, user, cart, addToCart, removeFromCart } = useAppContext();
 
   const product = products.find(p => p.id === Number(id));
+  usePageTitle(product.name);
 
   if (!product) {
     return (

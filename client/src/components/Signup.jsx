@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function Signup() {
+  usePageTitle("Create Account");
   const navigate = useNavigate();
   const { signup } = useAppContext();
   const [formData, setFormData] = useState({

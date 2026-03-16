@@ -1,17 +1,8 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import products from "../data/Products";
 import { sendEvent } from "../utils/eventSender";
 import toast from "react-hot-toast"
-
-const AppContext = createContext();
-
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useAppContext must be used within AppProvider");
-  }
-  return context;
-};
+import { AppContext } from "./useAppContext";
 
 // Generate UUID
 const generateUUID = () => {
@@ -26,30 +17,28 @@ const STORAGE_KEYS = {
 };
 
 export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [cart, setCart] = useState([]);
-
-  // Initialize from localStorage on mount
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
+    if (!savedUser) return null;
+
+    try {
+      return JSON.parse(savedUser);
+    } catch (e) {
+      console.error("Failed to parse user from localStorage", e);
+      return null;
+    }
+  });
+  const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem(STORAGE_KEYS.CART);
+    if (!savedCart) return [];
 
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error("Failed to parse user from localStorage", e);
-      }
+    try {
+      return JSON.parse(savedCart);
+    } catch (e) {
+      console.error("Failed to parse cart from localStorage", e);
+      return [];
     }
-
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
-      }
-    }
-  }, []);
+  });
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {

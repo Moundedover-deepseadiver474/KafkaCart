@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function ProductList() {
+  usePageTitle("Home");
   const { products } = useAppContext();
-
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] p-8">

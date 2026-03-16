@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -13,29 +13,51 @@ import {
   CartesianGrid
 } from "recharts";
 
+import {
+  demoSummary,
+  demoTopProducts,
+  demoCart,
+  demoPayments
+} from "../data/demoAnalytics";
+import usePageTitle from "../hooks/usePageTitle";
+
 const API_BASE = "http://localhost:3000";
 
 export default function AnalyticsPage() {
+  usePageTitle("Analytics");
+  const [mode, setMode] = useState(null); // demo | live
 
   const [summary, setSummary] = useState(null);
   const [topProducts, setTopProducts] = useState([]);
   const [cart, setCart] = useState(null);
   const [payments, setPayments] = useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  useEffect(() => {
-    document.title = "Event Analytics";
-  }, []);
-
   /* ---------------- FETCH ANALYTICS ---------------- */
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
+
+    if (mode === "demo") {
+
+      setSummary(demoSummary);
+      setTopProducts(demoTopProducts);
+      setCart(demoCart);
+      setPayments(demoPayments);
+
+      setLastUpdated(new Date());
+      setLoading(false);
+      setError(null);
+
+      return;
+    }
 
     try {
+
+      setLoading(true);
 
       const responses = await Promise.all([
         fetch(`${API_BASE}/analytics/summary`),
@@ -53,35 +75,78 @@ export default function AnalyticsPage() {
       setPayments(paymentsData || {});
 
       setLastUpdated(new Date());
-
-      setLoading(false);
       setError(null);
 
     } catch (err) {
 
       console.error("Analytics fetch failed", err);
       setError("Failed to load analytics");
-      setLoading(false);
+
     } finally {
+
       setLoading(false);
+
     }
-  };
+  }, [mode]);
 
   /* ---------------- AUTO REFRESH ---------------- */
 
   useEffect(() => {
 
+    if (!mode) return;
+
     fetchAnalytics();
 
-    const interval = setInterval(fetchAnalytics, 10000);
+    if (mode === "live") {
+      const interval = setInterval(fetchAnalytics, 10000);
+      return () => clearInterval(interval);
+    }
 
-    return () => clearInterval(interval);
+  }, [mode, fetchAnalytics]);
 
-  }, []);
+  /* ---------------- MODE SELECTOR ---------------- */
+
+  if (!mode) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+
+        <div className="bg-[#141414] border border-[#222] rounded-md p-6 w-[320px] text-center">
+
+          <h2 className="text-lg font-semibold text-[#00ff88] mb-3">
+            Analytics Mode
+          </h2>
+
+          <p className="text-sm text-gray-400 mb-6">
+            Choose how you want to view analytics
+          </p>
+
+          <div className="flex gap-3 justify-center">
+
+            <button
+              onClick={() => setMode("demo")}
+              className="bg-[#00ff88] text-black px-4 py-2 rounded hover:bg-[#00dd77]"
+            >
+              Demo
+            </button>
+
+            <button
+              onClick={() => setMode("live")}
+              className="border border-[#00ff88] text-[#00ff88] px-4 py-2 rounded hover:bg-[#00ff88] hover:text-black"
+            >
+              Real-Time
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
 
   /* ---------------- LOADING ---------------- */
 
-  if (loading) {
+  if (loading && !summary) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-gray-400 text-xl">
         Loading analytics...
@@ -117,25 +182,17 @@ export default function AnalyticsPage() {
     { name: "Orders", value: summary?.orders || 0 }
   ];
 
-  /* ---------------- EXTRA ANALYTICS ---------------- */
+  const conversionRate = summary?.productViews ? ((summary.orders / summary.productViews) * 100).toFixed(2) : 0;
 
-  const conversionRate =
-    summary?.productViews
-      ? ((summary.orders / summary.productViews) * 100).toFixed(2)
-      : 0;
-
-  const cartRate =
-    summary?.productViews
-      ? ((summary.addToCart / summary.productViews) * 100).toFixed(2)
-      : 0;
+  const cartRate = summary?.productViews ? ((summary.addToCart / summary.productViews) * 100).toFixed(2) : 0;
 
   const COLORS = [
-    "#22c55e", // green
-    "#3b82f6", // blue
-    "#f59e0b", // amber
-    "#ef4444", // red
-    "#a855f7", // purple
-    "#14b8a6"  // teal
+    "#22c55e",
+    "#3b82f6",
+    "#f59e0b",
+    "#ef4444",
+    "#a855f7",
+    "#14b8a6"
   ];
 
   const formatNumber = (num) => {
@@ -148,8 +205,6 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-200">
 
-      {/* CONTAINER */}
-
       <div className="max-w-7xl mx-auto p-4">
 
         {/* HEADER */}
@@ -157,15 +212,33 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between mb-6">
 
           <div>
-            <h1 className="text-xl font-semibold text-[#00ff88]">
-              Real-Time Analytics
-            </h1>
+
+            <div className="flex items-center gap-3">
+
+              <h1 className="text-xl font-semibold text-[#00ff88]">
+                Real-Time Analytics
+              </h1>
+
+              {/* <span className={`text-xs px-2 py-1 rounded 
+                ${mode === "demo"
+                  ? "bg-yellow-500 text-black"
+                  : "bg-green-600 text-white"
+                }`}
+              >
+                {mode === "demo" ? "DEMO MODE" : "LIVE"}
+              </span> */}
+
+            </div>
 
             {lastUpdated && (
               <p className="text-xs text-gray-200">
-                Updated at : <span className="text-green-500">{lastUpdated.toLocaleTimeString()}</span>
+                Updated at :
+                <span className="text-green-500 ml-1">
+                  {lastUpdated.toLocaleTimeString()}
+                </span>
               </p>
             )}
+
           </div>
 
           <button
@@ -198,8 +271,6 @@ export default function AnalyticsPage() {
 
         <div className="grid lg:grid-cols-2 gap-4">
 
-          {/* TOP PRODUCTS */}
-
           <ChartContainer title="Top Viewed Products">
 
             <ResponsiveContainer width="100%" height={180}>
@@ -208,29 +279,19 @@ export default function AnalyticsPage() {
 
                 <CartesianGrid stroke="#1f1f1f" />
 
-                <XAxis
-                  dataKey="productId"
-                  stroke="#888"
-                  fontSize={10}
-                />
+                <XAxis dataKey="productId" stroke="#888" fontSize={10} />
 
                 <YAxis stroke="#888" fontSize={10} />
 
                 <Tooltip />
 
-                <Bar
-                  dataKey="views"
-                  fill="#00ff88"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="views" fill="#00ff88" radius={[4, 4, 0, 0]} />
 
               </BarChart>
 
             </ResponsiveContainer>
 
           </ChartContainer>
-
-          {/* PAYMENT DISTRIBUTION */}
 
           <ChartContainer title="Payment Distribution">
 
@@ -243,9 +304,7 @@ export default function AnalyticsPage() {
                   dataKey="value"
                   nameKey="name"
                   outerRadius={50}
-                  label={({ percent }) =>
-                    `${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 >
                   {paymentData.map((entry, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
@@ -253,19 +312,13 @@ export default function AnalyticsPage() {
                 </Pie>
 
                 <Tooltip />
-
-                <Legend
-                  iconSize={8}
-                  wrapperStyle={{ fontSize: "11px" }}
-                />
+                <Legend iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
 
               </PieChart>
 
             </ResponsiveContainer>
 
           </ChartContainer>
-
-          {/* CART ACTIVITY */}
 
           <ChartContainer title="Cart Activity">
 
@@ -274,30 +327,17 @@ export default function AnalyticsPage() {
               <BarChart data={cartData}>
 
                 <CartesianGrid stroke="#1f1f1f" />
-
-                <XAxis
-                  dataKey="name"
-                  stroke="#888"
-                  fontSize={10}
-                />
-
+                <XAxis dataKey="name" stroke="#888" fontSize={10} />
                 <YAxis stroke="#888" fontSize={10} />
-
                 <Tooltip />
 
-                <Bar
-                  dataKey="value"
-                  fill="#00ff88"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="value" fill="#00ff88" radius={[4, 4, 0, 0]} />
 
               </BarChart>
 
             </ResponsiveContainer>
 
           </ChartContainer>
-
-          {/* EVENT DISTRIBUTION */}
 
           <ChartContainer title="Event Distribution">
 
@@ -306,22 +346,11 @@ export default function AnalyticsPage() {
               <BarChart data={eventDistribution}>
 
                 <CartesianGrid stroke="#1f1f1f" />
-
-                <XAxis
-                  dataKey="name"
-                  stroke="#888"
-                  fontSize={10}
-                />
-
+                <XAxis dataKey="name" stroke="#888" fontSize={10} />
                 <YAxis stroke="#888" fontSize={10} />
-
                 <Tooltip />
 
-                <Bar
-                  dataKey="value"
-                  fill="#00ff88"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="value" fill="#00ff88" radius={[4, 4, 0, 0]} />
 
               </BarChart>
 
@@ -338,13 +367,13 @@ export default function AnalyticsPage() {
 }
 
 /* ---------------- KPI CARD ---------------- */
+
 function Card({ title, value }) {
+
   return (
     <div className="bg-[#141414] border border-[#222] rounded-md px-3 py-2">
 
-      <p className="text-[11px] text-gray-400">
-        {title}
-      </p>
+      <p className="text-[11px] text-gray-400">{title}</p>
 
       <h3 className="text-lg font-semibold text-[#00ff88]">
         {value}
@@ -357,6 +386,7 @@ function Card({ title, value }) {
 /* ---------------- CHART CONTAINER ---------------- */
 
 function ChartContainer({ title, children }) {
+
   return (
     <div className="bg-[#141414] border border-[#222] rounded-md p-3">
 

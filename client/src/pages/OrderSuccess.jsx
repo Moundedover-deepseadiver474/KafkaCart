@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function OrderSuccess() {
+  usePageTitle("Order Success");
   const navigate = useNavigate();
 
   return (

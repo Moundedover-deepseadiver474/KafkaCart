@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
 import { sendEvent } from "../utils/eventSender";
 
 export default function ProductCard({ product }) {

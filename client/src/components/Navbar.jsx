@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -73,6 +73,16 @@ export default function Navbar() {
               </Link>
             </>
           )}
+
+          <Link
+            to="/analytics"
+            className="text-amber-500 flex items-center gap-1 group"
+          >
+            &gt; Analytics
+            <span className="transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:translate-x-1">
+              ↗
+            </span>
+          </Link>
 
         </div>
       </div>

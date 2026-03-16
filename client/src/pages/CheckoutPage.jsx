@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
 import { sendEvent } from "../utils/eventSender";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function CheckoutPage() {
+  usePageTitle("Checkout");
   const navigate = useNavigate();
   const { user, cart, getCartTotal, getCartItemsCount, clearCart } = useAppContext();
 
