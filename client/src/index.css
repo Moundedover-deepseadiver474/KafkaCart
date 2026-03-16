@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+* {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+  background: #0a0a0a;
+  color: #e0e0e0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Modern borderless inputs */
+input,
+select,
+textarea {
+  background: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: #252525 !important;
+}
+
+/* Modern buttons */
+button {
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Cards without borders */
+.card-no-border {
+  box-shadow: none;
+  border: none;
+}
